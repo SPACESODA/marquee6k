@@ -1,6 +1,6 @@
 /**
- * MARQUEE 3000 MARQUEE 3000 MARQUEE 3000 MARQUEE 3000 MARQUEE 3000
- * http://github.com/ezekielaquino/marquee3000
+ * marquee6000 marquee6000 marquee6000 marquee6000 marquee6000
+ * http://github.com/SPACESODA/marquee6000
  * Marquees for the new millennium v1.0
  * MIT License
  */
@@ -11,14 +11,14 @@
   } else if (typeof exports === 'object') {
     module.exports = factory();
   } else {
-    root.Marquee3k = factory();
+    root.marquee6k = factory();
   }
 }(this, function() {
   'use strict';
 
   let animationId = 0;
 
-  class Marquee3k {
+  class marquee6k {
     constructor(element, options) {
 
       if (element.children.length === 0) {
@@ -48,7 +48,7 @@
 
     _setupWrapper() {
       this.wrapper = document.createElement('div');
-      this.wrapper.classList.add('marquee3k__wrapper');
+      this.wrapper.classList.add('marquee6k__wrapper');
       this.wrapper.style.whiteSpace = 'nowrap';
     }
 
@@ -157,7 +157,7 @@
       }
     }
 
-    static init(options = { selector: 'marquee3k' }) {
+    static init(options = { selector: 'marquee6k' }) {
       if (animationId) window.cancelAnimationFrame(animationId);
 
       window.MARQUEES = [];
@@ -167,7 +167,7 @@
 
       for (let i = 0; i < marquees.length; i++) {
         const marquee = marquees[i];
-        const instance = new Marquee3k(marquee, options);
+        const instance = new marquee6k(marquee, options);
         MARQUEES.push(instance);
       }
 
@@ -197,6 +197,6 @@
     }
   }
 
-  return Marquee3k;
+  return marquee6k;
 
 }));

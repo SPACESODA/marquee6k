@@ -1,16 +1,16 @@
 {
-  "name": "marquee3000",
-  "description": "The smoothest javascript marquees for the new millennium",
-  "main": "marquee3k.js",
+  "name": "marquee6000",
+  "description": "The smoothest javascript marquees forever",
+  "main": "marquee6k.js",
   "authors": [
-    "Ezekiel Aquino <ezekielaquino@gmail.com>"
+    "SPACESODA <spacesoda@gmail.com>"
   ],
   "license": "MIT",
   "keywords": [
     "marquee",
     "marquees"
   ],
-  "homepage": "https://github.com/ezekielaquino/Marquee3000",
+  "homepage": "https://github.com/SPACESODA/marquee6000",
   "ignore": [
     "**/.*",
     "node_modules",

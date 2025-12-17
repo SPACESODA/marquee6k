@@ -1,6 +1,6 @@
 /**
- * MARQUEE 3000 MARQUEE 3000 MARQUEE 3000 MARQUEE 3000 MARQUEE 3000
- * http://github.com/ezekielaquino/marquee3000
+ * marquee6000 marquee6000 marquee6000 marquee6000 marquee6000
+ * http://github.com/SPACESODA/marquee6000
  * Marquees for the new millennium v1.0
  * MIT License
  */
@@ -9,7 +9,7 @@
 
 let animationId = 0;
 
-class Marquee3k {
+class marquee6k {
   constructor(element, options) {
     this.element = element;
     this.selector = options.selector;
@@ -34,7 +34,7 @@ class Marquee3k {
 
   _setupWrapper() {
     this.wrapper = document.createElement('div');
-    this.wrapper.classList.add('marquee3k__wrapper');
+    this.wrapper.classList.add('marquee6k__wrapper');
     this.wrapper.style.whiteSpace = 'nowrap';
   }
 
@@ -143,7 +143,7 @@ class Marquee3k {
     }
   }
 
-  static init(options = { selector: 'marquee3k' }) {
+  static init(options = { selector: 'marquee6k' }) {
     if (animationId) window.cancelAnimationFrame(animationId);
 
     window.MARQUEES = [];
@@ -153,7 +153,7 @@ class Marquee3k {
 
     for (let i = 0; i < marquees.length; i++) {
       const marquee = marquees[i];
-      const instance = new Marquee3k(marquee, options);
+      const instance = new marquee6k(marquee, options);
       MARQUEES.push(instance);
     }
 
@@ -184,4 +184,4 @@ class Marquee3k {
   }
 }
 
-export default Marquee3k;
+export default marquee6k;

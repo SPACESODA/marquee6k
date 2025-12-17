@@ -2,7 +2,7 @@ interface Options {
   selector: string
 }
 
-declare class Marquee3k {
+declare class marquee6k {
   constructor(element: HTMLElement, options: Options)
   animate(): void
   repopulate(difference: number, isLarger: boolean): void
@@ -16,6 +16,6 @@ declare class Marquee3k {
   static init(options?: Options): void
 }
 
-declare module 'marquee3000' {
-  export = Marquee3k
+declare module 'marquee6000' {
+  export = marquee6k
 }
