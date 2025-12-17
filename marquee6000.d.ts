@@ -1,5 +1,5 @@
 interface Options {
-  selector: string
+  selector?: string
 }
 
 declare class marquee6k {
@@ -11,6 +11,7 @@ declare class marquee6k {
   static play(index: number): void
   static toggle(index: number): void
   static refreshAll(): void
+  static pauseAll(): void
   static playAll(): void
   static toggleAll(): void
   static init(options?: Options): void

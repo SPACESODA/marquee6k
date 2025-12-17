@@ -5,8 +5,26 @@
   "keywords": ["marquee", "marquees"],
   "types": "marquee6k.d.ts",
   "main": "marquee6k.js",
-  "repository": "https://github.com/ezekielaquino/Marquee3000",
-  "homepage": "https://ezekielaquino.github.io/Marquee3000/",
-  "author": "Ezekiel Aquino <ezekielaquino@gmail.com>",
-  "dependencies": {}
+  "module": "marquee6k.esm.js",
+  "files": [
+    "marquee6k.js",
+    "marquee6k.esm.js",
+    "marquee6000.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": "https://github.com/SPACESODA/marquee6000",
+  "homepage": "https://github.com/SPACESODA/marquee6000",
+  "author": {
+    "name": "Anthony C",
+    "url": "https://x.com/anthonycxc"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "rollup": "^4.24.0"
+  }
 }

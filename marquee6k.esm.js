@@ -10,11 +10,15 @@ let animationId = 0;
 
 class marquee6k {
   constructor(element, options) {
+    if (element.children.length === 0) {
+      throw new Error('Encountered a marquee element without children, please supply a wrapper for your content');
+    }
+
     this.element = element;
     this.selector = options.selector;
     this.speed = element.dataset.speed || 0.25;
-    this.pausable = element.dataset.pausable;
-    this.reverse = element.dataset.reverse;
+    this.pausable = element.dataset.pausable === 'true';
+    this.reverse = element.dataset.reverse === 'true';
     this.paused = false;
     this.parent = element.parentElement;
     this.parentProps = this.parent.getBoundingClientRect();

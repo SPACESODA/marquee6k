@@ -20,7 +20,8 @@ Super smooth and versatile javaScript plugin with no dependencies.
 
 ## Usage
 
-1. Include marquee6000 in your html file. Download zip or install via `bower install marquee6000` || `npm install marquee6000`
+1. Include marquee6000 in your html file.  
+   Download zip or install via `npm install marquee6000`
 
     ```javascript
         const marquee6k = require('marquee6000');
@@ -28,20 +29,19 @@ Super smooth and versatile javaScript plugin with no dependencies.
         import marquee6k from 'marquee6000';
     ```
 
-
     ```html
         <script src="marquee6k.js"></script>
      ```
         
-2. Create an element with a `.marquee6k` class. You can pass different options such as speed, orientation and direction (optional). See below for options.
+2. Create an element with a `.marquee6k` class.  
+   You can pass different options such as speed, orientation and direction (optional). See below for options.
 
     ```html
         <div class="marquee6k" 
             data-speed="0.25" → play around here
             data-reverse="bool" → default: R to L / T to B
             data-pausable="bool" → Pause marquee on hover>
-            <!--you can even have inline images,
-            or any kind of html -->
+            <!--you can even have inline images, or any kind of html -->
             <h1>Some marquee content</h1>
         </div>
     ```
@@ -50,14 +50,15 @@ Super smooth and versatile javaScript plugin with no dependencies.
 
 4. In your js file or `<script>` just call `marquee6k.init()` and you're all set!
 
-5. To set spacing and other wonderful things, please use css
+5. To set spacing and other wonderful things, please use css (each repeated segment gets a `${selector}__copy` class – default is `marquee6k__copy`; the `diagonal-marquee` wrapper below is just an example, not required)
 
     ```css
-        // Parent container of a .marquee6k element
+        /* Example: Optional wrapper to rotate/transform the whole marquee */
         .diagonal-marquee {
             transform: rotate(45deg);
         }
 
+        /* Each repeated segment uses `${selector}__copy` (default: .marquee6k__copy) */
         .marquee6k__copy {
             padding-right: 30px;
             box-sizing: border-box;
@@ -131,6 +132,13 @@ You can set additional configuration options.
 
 Marquee also adds a `is-init` selector. You can use this to add and toggle entrance transitions, for example.
 
+### Build
+
+The source of truth is `src/marquee6k.js`. Run the build to generate both `marquee6k.js` (UMD) and `marquee6k.esm.js` (ESM):
+
+```bash
+npm run build
+```
 
 ### Questions
 
