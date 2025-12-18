@@ -20,7 +20,8 @@ Super smooth and versatile javaScript plugin with no dependencies.
 
 ## Usage
 
-1. Include marquee6k in your html file.  
+1. Include marquee6k in your html file (before the closing `</body>` tag).
+   This ensures that all HTML elements are loaded before the script tries to animate them.  
    Download zip or install via `npm install marquee6k`.
 
     via jsDelivr:

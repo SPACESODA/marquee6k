@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Super smooth, lightweight vanilla JavaScript marquee library. No dependencies. High performance.">
+    <meta name="theme-color" content="#f6f7fb">
     <title>marquee6k - Smooth JS Marquee</title>
     <style>
         :root {
@@ -41,6 +44,24 @@
             font-family: var(--font-family);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 999px;
+            background: rgba(2, 6, 23, 0.92);
+            color: #fff;
+            text-decoration: none;
+            z-index: 9999;
+        }
+
+        .skip-link:focus {
+            left: 0.75rem;
+            outline: 3px solid rgba(59, 130, 246, 0.55);
+            outline-offset: 3px;
         }
 
         /* Typography & Layout */
@@ -291,7 +312,9 @@
 
 <body>
 
-    <div class="container">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <main id="main" class="container">
         <header>
             <h1>marquee6k</h1>
             <p class="subtitle">
@@ -323,22 +346,26 @@
             <p class="section-title">Implementation</p>
             <div class="info-card">
                 <h2>How to add a marquee</h2>
-                <p>Include the script, add a <code>.marquee6k</code> element, then call <code>marquee6k.init()</code>.
-                    Configure behavior with simple <code>data-*</code> attributes.</p>
+                <p>Include the script (before <code>&lt;/body&gt;</code>), add a <code>.marquee6k</code> element with a
+                    single child wrapper for your content, then call <code>marquee6k.init()</code>. Configure behavior
+                    with <code>data-*</code> attributes. If you're using images or webfonts, initialize after the
+                    <code>load</code> event (or call <code>marquee6k.refreshAll()</code> once assets have loaded).</p>
 
                 <div class="info-grid">
                     <div>
                         <div class="info-list">
                             <div class="info-item">
                                 <strong>1) Markup</strong>
-                                <div>Add <code>class="marquee6k"</code> and put any HTML inside (text, images, etc.).
+                                <div>Add <code>class="marquee6k"</code> and wrap your content in a single child element
+                                    (required) — put any HTML inside (text, images, etc.).
                                 </div>
                             </div>
                             <div class="info-item">
                                 <strong>2) Config</strong>
                                 <div>
-                                    Use <code>data-speed</code> (e.g. <code>1.5</code>), <code>data-reverse</code>
-                                    (<code>true</code>/<code>false</code>), and <code>data-pausable</code> (pause on
+                                    Use <code>data-speed</code> (e.g. <code>0.25</code>, default is <code>0.25</code>),
+                                    <code>data-reverse</code>
+                                    (<code>"true"</code>/<code>"false"</code>), and <code>data-pausable</code> (pause on
                                     hover).
                                 </div>
                             </div>
@@ -349,25 +376,24 @@
                         </div>
                     </div>
 
-                    <div class="code-block" aria-label="Example code">
+                    <div class="code-block" role="region" aria-label="Drop-in example (HTML)">
                         <div class="code-title">
                             <span>Drop-in example</span>
                             <span>HTML</span>
                         </div>
-                        <pre><code>&lt;!-- Load the library --&gt;
-&lt;script src="marquee6k.js"&gt;&lt;/script&gt;
+                        <pre><code>&lt;style&gt;
+  .marquee6k__copy { padding-right: 48px; }
+&lt;/style&gt;
 
-&lt;div class="marquee6k" data-speed="1.2" data-pausable="true"&gt;
+&lt;div class="marquee6k" data-speed="0.25" data-pausable="true"&gt;
   &lt;div&gt;Hello marquee • Hello marquee •&lt;/div&gt;
 &lt;/div&gt;
 
+&lt;!-- Place before &lt;/body&gt; --&gt;
+&lt;script src="marquee6k.js"&gt;&lt;/script&gt;
 &lt;script&gt;
-  marquee6k.init();
-&lt;/script&gt;
-
-&lt;style&gt;
-  .marquee6k__copy { padding-right: 48px; }
-&lt;/style&gt;</code></pre>
+  window.addEventListener('load', () =&gt; marquee6k.init());
+&lt;/script&gt;</code></pre>
                     </div>
                 </div>
             </div>
@@ -378,16 +404,17 @@
             <div class="s2-cta">
                 <h3>Marquee on Webflow</h3>
                 <p>See it in action with the S2 Framework:</p>
-                <a href="https://s2-framework.webflow.io/s2/components#marquee" target="_blank" class="s2-link">
+                <a href="https://s2-framework.webflow.io/s2/components#marquee" target="_blank"
+                    rel="noopener noreferrer" class="s2-link">
                     Visit the Demo on S2 Framework &rarr;
                 </a>
             </div>
         </section>
 
-    </div>
+    </main>
 
     <footer>
-        <p>Created by <a href="https://github.com/SPACESODA" style="color: inherit;">SPACESODA</a></p>
+        <p>Created by <a href="https://github.com/SPACESODA">SPACESODA</a></p>
     </footer>
 
     <!-- Load Library -->
@@ -395,7 +422,7 @@
 
     <!-- Initialize -->
     <script>
-        marquee6k.init();
+        window.addEventListener('load', () => marquee6k.init());
     </script>
 </body>
 
