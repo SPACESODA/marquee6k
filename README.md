@@ -1,8 +1,8 @@
 # marquee6k
 
+**marquee6k** is a super smooth, lightweight vanilla JavaScript marquee library.  
+No dependencies. High performance.  
 Marquees forever ✨
-
-Super smooth and versatile javaScript plugin with no dependencies.
 
 # Initialize
 
@@ -11,7 +11,6 @@ Super smooth and versatile javaScript plugin with no dependencies.
 ## Features
 - ~3kb minified with no dependencies
 - Turn any element into a smooth-as-butter marquee
-- Text, images++<sup>*</sup> it'll do it
 - Style marquees as usual with CSS
 - Set speed and direction
 - Have a ton without any slowdown
@@ -176,9 +175,9 @@ A: You have to pass in only the name of the function (must be defined in global 
 
 ## Credits
 
-This project is a fork of the popular (but long unmaintained) [Marquee3000](https://github.com/ezekielaquino/Marquee3000). If 3000 is a millennium, we guess 6000 is forever.
+This project is a fork of the popular (but long unmaintained) [Marquee3000](https://github.com/ezekielaquino/Marquee3000). If 3000 is a millennium, I guess 6000 is forever. Don't ask me why.
 
-The codebase has been fully modernized with TypeScript, squashed lingering bugs, and polished it up for the modern web. Same butter-smooth performance, just future-proofed.
+The **marquee6k** codebase has been fully modernized with TypeScript, squashed lingering bugs, and polished it up for the modern web. Same butter-smooth performance, just future-proofed.
 
 ## License
 
