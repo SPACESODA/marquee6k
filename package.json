@@ -1,6 +1,6 @@
 {
   "name": "marquee6k",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Internet marquees in HD!",
   "keywords": [
     "marquee",
@@ -11,7 +11,9 @@
   "module": "marquee6k.esm.js",
   "files": [
     "marquee6k.js",
+    "marquee6k.js.map",
     "marquee6k.esm.js",
+    "marquee6k.esm.js.map",
     "marquee6k.d.ts",
     "README.md",
     "LICENSE"

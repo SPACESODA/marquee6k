@@ -21,15 +21,12 @@ Marquees forever ✨
 
 1. Include marquee6k in your html file (before the closing `</body>` tag).
    This ensures that all HTML elements are loaded before the script tries to animate them.  
-   Download zip or install via `npm install marquee6k`.
+   Download or install via `npm install marquee6k`.
 
     via jsDelivr:
     ```html
     <!-- Latest version -->
     <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
-    
-    <!-- Specific version -->
-    <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@1.3.2/marquee6k.min.js"></script>
     ```
 
     via npm:
@@ -86,8 +83,7 @@ You can refresh (if width of the inner content changes dynamically) by:
     // Refresh all instances
     marquee6k.refreshAll();
 
-    // or, since all marquees are available
-    // globally, target a specific instance
+    // or, since all marquees are available globally, target a specific instance
     marquee6k.refresh(index); // index of marquee
 ```
     
