@@ -4,8 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Super smooth, lightweight vanilla JavaScript marquee library. No dependencies. High performance.">
+    <meta name="description" content="Super smooth, lightweight vanilla JavaScript marquee library. No dependencies. High performance.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://github.com/SPACESODA/marquee6k">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="marquee6k">
+    <meta property="og:title" content="marquee6k - Smooth JS Marquee">
+    <meta property="og:description" content="Super smooth, lightweight vanilla JavaScript marquee library. No dependencies. High performance.">
+    <meta property="og:url" content="https://github.com/SPACESODA/marquee6k">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="marquee6k - Smooth JS Marquee">
+    <meta name="twitter:description" content="Super smooth, lightweight vanilla JavaScript marquee library. No dependencies. High performance.">
     <meta name="theme-color" content="#f6f7fb">
     <title>marquee6k - Smooth JS Marquee</title>
     <style>
@@ -83,6 +92,7 @@
             margin-bottom: 1rem;
             background: var(--gradient-1);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -2px;
             line-height: 1.02;
@@ -136,7 +146,13 @@
             overflow: hidden;
             padding: clamp(2rem, 4vw, 3rem) 0;
             box-shadow: var(--shadow-lg);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
+        }
+
+        .marquee6k--secondary {
+            margin-top: 1rem;
+            opacity: 0.5;
         }
 
         /* Implementation / Docs card */
@@ -328,12 +344,13 @@
         <section class="demo-section">
 
             <div class="card">
-                <div class="marquee6k" data-speed="1.5">
+                <div class="marquee6k" data-speed="1.5" data-pausable="true">
                     <div class="big-text">
                         LIGHTWEIGHT • SMOOTH • PERFORMANT • ZERO DEPENDENCIES •
                     </div>
                 </div>
-                <div class="marquee6k" data-speed="0.5" data-reverse="true" style="margin-top: 1rem; opacity: 0.5;">
+                <div class="marquee6k marquee6k--secondary" data-speed="0.5" data-reverse="true"
+                    data-pausable="true">
                     <div class="big-text outline-text">
                         SCROLL LEFT • SCROLL RIGHT • ANY CONTENT •
                     </div>
@@ -402,8 +419,8 @@
         <!-- Demo on S2 Framework -->
         <section class="demo-section">
             <div class="s2-cta">
-                <h3>Marquee on Webflow</h3>
-                <p>See it in action with the S2 Framework:</p>
+                <h3>marquee6k on Webflow</h3>
+                <p>See it in action with the S2 Framework.</p>
                 <a href="https://s2-framework.webflow.io/s2/components#marquee" target="_blank"
                     rel="noopener noreferrer" class="s2-link">
                     Visit the Demo on S2 Framework &rarr;

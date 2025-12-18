@@ -19,18 +19,21 @@ Marquees forever ✨
 
 ## Usage
 
-1. Include marquee6k in your html file (before the closing `</body>` tag).
-   This ensures that all HTML elements are loaded before the script tries to animate them.  
+1. Include marquee6k in your html file.
+
+   It is the best to place it before the closing `</body>` tag.
+   This ensures that all HTML elements are loaded before the script tries to animate them.
+
+   local:  
    Download or install via `npm install marquee6k`.
 
-    via jsDelivr:
+    via jsDelivr:  
     ```html
     <!-- Latest version -->
     <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
     ```
 
-    via npm:
-
+    via npm:  
     ```javascript
         const marquee6k = require('marquee6k');
         // or
@@ -73,7 +76,7 @@ Marquees forever ✨
         }
     ```
 
-### New stuff
+### Good stuff
 
 #### Refresh
 
@@ -177,4 +180,4 @@ The **marquee6k** codebase has been fully modernized with TypeScript, squashed l
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License.
