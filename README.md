@@ -21,7 +21,18 @@ Super smooth and versatile javaScript plugin with no dependencies.
 ## Usage
 
 1. Include marquee6k in your html file.  
-   Download zip or install via `npm install marquee6k`
+   Download zip or install via `npm install marquee6k`.
+
+    via jsDelivr:
+    ```html
+    <!-- Latest version -->
+    <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
+    
+    <!-- Specific version -->
+    <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@1.3.2/marquee6k.min.js"></script>
+    ```
+
+    via npm:
 
     ```javascript
         const marquee6k = require('marquee6k');
