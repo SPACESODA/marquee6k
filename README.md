@@ -1,7 +1,8 @@
 # marquee6k
 
 **marquee6k** is a super smooth, lightweight vanilla JavaScript marquee library.  
-No dependencies. High performance.  
+No dependencies. Powerful and high-performance.  
+It is the best marquee library out there.  
 Marquees forever ✨✨✨
 
 <br>
@@ -32,6 +33,7 @@ Marquees forever ✨✨✨
 
     ```html
     <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
+    <script>marquee6k.init();</script>
     ```
    
    Via [npm](https://www.npmjs.com/package/marquee6k) (bundler):
@@ -50,6 +52,7 @@ Marquees forever ✨✨✨
 
     ```html
     <script src="marquee6k.js"></script>
+    <script>marquee6k.init();</script>
     ```
 
 2. Create an element with a `.marquee6k` class.
@@ -67,14 +70,7 @@ Marquees forever ✨✨✨
     
     Add your content (text, images, or any inline HTML).
 
-3. Add the script before `</body>` and call `marquee6k.init()`. Example with CDN:
-
-    ```html
-    <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
-    <script>marquee6k.init();</script>
-    ```
-
-4. Use CSS for spacing and styling. The script adds a `${className}__copy` class to each repeated segment (default is `.marquee6k__copy`). This class name pattern is part of the public API, so use it as-is when styling.
+3. Use CSS for spacing and styling. The script adds a `${className}__copy` class to each repeated segment (default is `.marquee6k__copy`). This class name pattern is part of the public API, so use it as-is when styling.
    
     ```css
     /* Example: Optional wrapper to rotate/transform the whole marquee */
