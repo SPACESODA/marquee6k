@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>marquee6k test</title>
+        <style>
+            :root {
+                color-scheme: light;
+                --bg: #f6f2ea;
+                --ink: #151515;
+                --ink-soft: #5a554d;
+                --accent: #f28d35;
+                --accent-dark: #c55f1b;
+                --panel: #ffffff;
+                --line: #e4ded3;
+                --shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+                --radius: 18px;
+                --font-head: Arial, "Helvetica Neue", Helvetica, sans-serif;
+                --font-body: Arial, "Helvetica Neue", Helvetica, sans-serif;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: clamp(18px, 3vw, 40px);
+                background: radial-gradient(circle at top, #fff8ec, var(--bg) 40%, #efe6d6);
+                color: var(--ink);
+                font-family: var(--font-body);
+                overflow-x: hidden;
+            }
+
+            .container {
+                max-width: 1120px;
+                margin: 0 auto;
+                display: grid;
+                gap: 24px;
+            }
+
+            .hero {
+                background: var(--panel);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                padding: clamp(18px, 3vw, 28px);
+                display: grid;
+                gap: 12px;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                color: var(--accent-dark);
+                background: #fff2e6;
+                padding: 6px 12px;
+                border-radius: 999px;
+                width: fit-content;
+                text-decoration: none;
+            }
+
+            .badge:hover {
+                color: #8a3d12;
+            }
+
+            h1 {
+                margin: 0;
+                font-size: clamp(24px, 3vw, 34px);
+                font-family: var(--font-head);
+            }
+
+            p {
+                margin: 0;
+                color: var(--ink-soft);
+                max-width: 560px;
+                line-height: 1.5;
+            }
+
+            h2 {
+                margin: 0 0 10px;
+                font-size: 14px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--ink-soft);
+            }
+
+            .controls {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+
+            button {
+                padding: 10px 16px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: #fff;
+                cursor: pointer;
+                font-weight: 600;
+                transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            }
+
+            button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+                border-color: var(--accent);
+            }
+
+            button.primary {
+                background: var(--accent);
+                color: #fff;
+                border-color: transparent;
+            }
+
+            .demo {
+                display: grid;
+                gap: 20px;
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .card {
+                background: var(--panel);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                padding: 16px;
+                display: grid;
+                gap: 12px;
+                min-width: 0;
+                animation: rise 0.6s ease both;
+            }
+
+            .card:nth-child(2) { animation-delay: 0.08s; }
+            .card:nth-child(3) { animation-delay: 0.16s; }
+            .card:nth-child(4) { animation-delay: 0.24s; }
+
+            .marquee-viewport {
+                background: linear-gradient(135deg, #fff 0%, #fff7ee 100%);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                overflow: hidden;
+                padding: 12px;
+                width: 100%;
+                min-width: 0;
+                position: relative;
+            }
+
+            .marquee-viewport.guided {
+                background-image: linear-gradient(135deg, #fff 0%, #fff7ee 100%),
+                    repeating-linear-gradient(
+                        to bottom,
+                        rgba(242, 141, 53, 0.08) 0,
+                        rgba(242, 141, 53, 0.08) 22px,
+                        rgba(255, 255, 255, 0) 22px,
+                        rgba(255, 255, 255, 0) 44px
+                    );
+            }
+
+            .marquee-viewport::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: inherit;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+                pointer-events: none;
+            }
+
+            .marquee-viewport.horizontal {
+                height: 66px;
+            }
+
+            .marquee-viewport.vertical {
+                height: 220px;
+            }
+
+            .marquee6k__copy,
+            .demo-marquee__copy {
+                padding-right: 26px;
+                padding-bottom: 12px;
+            }
+
+            .tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 14px;
+                border-radius: 999px;
+                background: #111;
+                color: #fff;
+                margin-right: 10px;
+                font-weight: 600;
+                font-size: 14px;
+                white-space: nowrap;
+            }
+
+            .tag.alt {
+                background: #fce4cf;
+                color: #5b3517;
+            }
+
+            .marquee-viewport.vertical .tag {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .marquee-viewport.vertical .marquee6k__copy {
+                padding-bottom: 22px;
+            }
+
+            .cross-box {
+                position: relative;
+                height: 260px;
+                overflow: hidden;
+                padding: 24px 0;
+            }
+
+            .cross-line {
+                position: absolute;
+                left: -20%;
+                right: -20%;
+                top: 50%;
+                transform-origin: center;
+            }
+
+            .cross-line--a {
+                transform: translateY(-50%) rotate(20deg);
+            }
+
+            .cross-line--b {
+                transform: translateY(-50%) rotate(-15deg);
+            }
+
+            .cross-line .marquee6k {
+                width: 100%;
+            }
+
+            .stack {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .stack .tag {
+                margin-right: 0;
+                margin-bottom: 0;
+            }
+
+            .narrow {
+                max-width: 280px;
+            }
+
+            .diagonal-marquee {
+                overflow: hidden;
+                padding: 44px 0;
+                display: block;
+            }
+
+            .diagonal-marquee .marquee-viewport {
+                transform: translateY(6px) rotate(-4deg);
+                transform-origin: center;
+            }
+
+
+            .log {
+                font-size: 12px;
+                color: var(--ink-soft);
+                background: #fff;
+                border: 1px dashed var(--line);
+                border-radius: 12px;
+                padding: 12px;
+            }
+
+            .demo-area {
+                border: 1px dashed rgba(21, 21, 21, 0.15);
+                border-radius: 14px;
+                padding: 12px;
+                background: #fffdf8;
+                min-width: 0;
+            }
+
+            .metrics {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                font-size: 12px;
+                color: var(--ink-soft);
+            }
+
+            .metric {
+                background: #fff;
+                border: 1px solid var(--line);
+                border-radius: 999px;
+                padding: 6px 12px;
+            }
+
+            @keyframes rise {
+                from {
+                    opacity: 0;
+                    transform: translateY(18px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <section class="hero">
+                <a class="badge" href="index.html">marquee6k</a>
+                <h1>Tests for marquee6k</h1>
+                <p>This page is for QA, especially for visual QA.</p>
+                <div class="controls">
+                    <button class="primary" type="button" onclick="marquee6k.playAll()">Play all</button>
+                    <button type="button" onclick="marquee6k.pauseAll()">Pause all</button>
+                    <button type="button" onclick="marquee6k.toggleAll()">Toggle all</button>
+                    <button type="button" onclick="marquee6k.refreshAll()">Refresh all</button>
+                </div>
+            </section>
+
+            <div class="demo">
+                <section class="card">
+                    <h2>Horizontal (left)</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k" data-speed="0.6" data-pausable="true">
+                            <div>
+                                <span class="tag">Alpha</span>
+                                <span class="tag">Bravo</span>
+                                <span class="tag">Charlie</span>
+                                <span class="tag">Delta</span>
+                                <span class="tag">Echo</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Horizontal (right)</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k" data-speed="0.4" data-direction="right" data-pausable="true">
+                            <div>
+                                <span class="tag alt">North</span>
+                                <span class="tag">South</span>
+                                <span class="tag alt">East</span>
+                                <span class="tag">West</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Vertical (up)</h2>
+                    <div class="marquee-viewport vertical">
+                        <div class="marquee6k" data-speed="0.5" data-direction="up" data-pausable="true">
+                            <div>
+                                <div class="tag">Monday</div>
+                                <div class="tag alt">Tuesday</div>
+                                <div class="tag">Wednesday</div>
+                                <div class="tag alt">Thursday</div>
+                                <div class="tag">Friday</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Vertical (down)</h2>
+                    <div class="marquee-viewport vertical">
+                        <div class="marquee6k" data-speed="0.35" data-direction="down" data-pausable="true">
+                            <div>
+                                <div class="tag alt">One</div>
+                                <div class="tag">Two</div>
+                                <div class="tag alt">Three</div>
+                                <div class="tag">Four</div>
+                                <div class="tag alt">Five</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Init defaults only (speed from init)</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k defaults-only">
+                            <div>
+                                <span class="tag">Defaults</span>
+                                <span class="tag alt">From</span>
+                                <span class="tag">Init</span>
+                                <span class="tag alt">Options</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Data overrides init defaults</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k defaults-override" data-direction="left" data-speed="0.7">
+                            <div>
+                                <span class="tag alt">Override</span>
+                                <span class="tag">Speed</span>
+                                <span class="tag alt">+ Direction</span>
+                                <span class="tag">Via data-*</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Reverse only (no direction)</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k reverse-only" data-reverse="true">
+                            <div>
+                                <span class="tag">Reverse</span>
+                                <span class="tag alt">Only</span>
+                                <span class="tag">Mode</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Axis alias (data-axis="y")</h2>
+                    <div class="marquee-viewport vertical guided">
+                        <div class="marquee6k" data-axis="y" data-reverse="true" data-speed="0.45">
+                            <div class="stack">
+                                <div class="tag">Axis</div>
+                                <div class="tag alt">Alias</div>
+                                <div class="tag">Down</div>
+                                <div class="tag alt">Mode</div>
+                                <div class="tag">Stacked</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Complex selector + className</h2>
+                    <div class="demo-area">
+                        <div class="marquee-viewport horizontal">
+                            <div data-marquee="true" class="demo-marquee">
+                                <div>
+                                    <span class="tag">Complex</span>
+                                    <span class="tag alt">Selector</span>
+                                    <span class="tag">Works</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Angled cross</h2>
+                    <div class="marquee-viewport cross-box">
+                        <div class="cross-line cross-line--a">
+                            <div class="marquee6k" data-speed="0.45" data-direction="left">
+                                <div>
+                                    <span class="tag">Diagonal</span>
+                                    <span class="tag alt">Cross</span>
+                                    <span class="tag">Line</span>
+                                    <span class="tag alt">A</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cross-line cross-line--b">
+                            <div class="marquee6k" data-speed="0.5" data-direction="right">
+                                <div>
+                                    <span class="tag alt">Diagonal</span>
+                                    <span class="tag">Cross</span>
+                                    <span class="tag alt">Line</span>
+                                    <span class="tag">B</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Diagonal wrapper</h2>
+                    <div class="diagonal-marquee">
+                        <div class="marquee-viewport horizontal">
+                            <div class="marquee6k" data-speed="0.5" data-direction="left">
+                                <div>
+                                    <span class="tag">Diagonal</span>
+                                    <span class="tag alt">Wrapper</span>
+                                    <span class="tag">Test</span>
+                                    <span class="tag alt">Tilt</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: zero speed</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k" data-speed="0" data-pausable="true">
+                            <div>
+                                <span class="tag alt">Speed</span>
+                                <span class="tag">Zero</span>
+                                <span class="tag alt">Stops</span>
+                                <span class="tag">Motion</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: narrow container</h2>
+                    <div class="narrow">
+                        <div class="marquee-viewport horizontal">
+                            <div class="marquee6k" data-speed="0.55">
+                                <div>
+                                    <span class="tag">Narrow</span>
+                                    <span class="tag alt">Viewport</span>
+                                    <span class="tag">Test</span>
+                                    <span class="tag alt">Clones</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="metrics">
+                <div class="metric">onUpdate calls: <span id="update-count">0</span></div>
+                <div class="metric">Last event: <span id="last-event">none</span></div>
+            </div>
+
+            <div class="log">Tip: open DevTools to see callback logs for onInit/onPause/onPlay.</div>
+        </div>
+
+        <script src="marquee6k.js"></script>
+        <script>
+            const updateCountEl = document.getElementById('update-count');
+            const lastEventEl = document.getElementById('last-event');
+            let updateCount = 0;
+            let lastUpdate = 0;
+
+            window.MARQUEE_OPTIONS = {
+                selector: '.marquee6k, .demo-area [data-marquee]',
+                className: 'demo-marquee',
+                speed: 0.3,
+                pausable: false,
+                onUpdateThrottle: 200,
+                onInit: (instance) => {
+                    console.log('init', instance);
+                    if (lastEventEl) lastEventEl.textContent = 'init';
+                },
+                onPause: (instance) => {
+                    console.log('pause', instance);
+                    if (lastEventEl) lastEventEl.textContent = 'pause';
+                },
+                onPlay: (instance) => {
+                    console.log('play', instance);
+                    if (lastEventEl) lastEventEl.textContent = 'play';
+                },
+                onUpdate: (instance) => {
+                    void instance;
+                    const now = performance.now();
+                    if (now - lastUpdate > 250) {
+                        updateCount += 1;
+                        lastUpdate = now;
+                        if (updateCountEl) updateCountEl.textContent = String(updateCount);
+                        if (lastEventEl) lastEventEl.textContent = 'update';
+                    }
+                },
+            };
+
+            marquee6k.init(window.MARQUEE_OPTIONS);
+        </script>
+    </body>
+</html>

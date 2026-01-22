@@ -5,6 +5,7 @@
         "moduleResolution": "bundler",
         "declaration": true,
         "sourceMap": true,
+        "rootDir": "src",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
