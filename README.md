@@ -28,7 +28,7 @@ Marquees forever ✨✨✨
    
    Place it before the closing `</body>` tag. Initialize marquee6k AFTER images or custom fonts have been loaded.
    
-   Via [jsDelivr](https://www.jsdelivr.com/package/gh/SPACESODA/marquee6k), latest version:
+   Via CDN ([jsDelivr](https://www.jsdelivr.com/package/gh/SPACESODA/marquee6k)), latest version:
 
     ```html
     <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
@@ -64,12 +64,17 @@ Marquees forever ✨✨✨
         <h1>Some marquee content</h1>
     </div>
     ```
+    
+    Add your content (text, images, or any inline HTML).
 
-3. Add your content (text, images, or any inline HTML).
+3. Add the script before `</body>` and call `marquee6k.init()`. Example with CDN:
 
-4. In your JS file or `<script>`, call `marquee6k.init()` to start the animation.
+    ```html
+    <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
+    <script>marquee6k.init();</script>
+    ```
 
-5. Use CSS for spacing and styling. The script adds a `${className}__copy` class to each repeated segment (default is `.marquee6k__copy`). This class name pattern is part of the public API, so use it as-is when styling.
+4. Use CSS for spacing and styling. The script adds a `${className}__copy` class to each repeated segment (default is `.marquee6k__copy`). This class name pattern is part of the public API, so use it as-is when styling.
    
     ```css
     /* Example: Optional wrapper to rotate/transform the whole marquee */
