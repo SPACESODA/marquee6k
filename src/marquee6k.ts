@@ -15,6 +15,9 @@ interface MarqueeOptions {
     speed?: number;
     reverse?: boolean;
     pausable?: boolean;
+    tapPause?: boolean;
+    scrubbing?: boolean | number;
+    scrubMomentum?: boolean;
     axis?: Axis;
     direction?: Direction;
     onInit?: (instance: marquee6k) => void;
@@ -26,11 +29,26 @@ interface MarqueeOptions {
 
 const DEFAULT_SELECTOR = 'marquee6k';
 const DEFAULT_SPEED = 0.25;
+const DEFAULT_SCRUB_DELAY = 250;
+const SCRUB_THRESHOLD = 10;
+const MOMENTUM_FRICTION = 0.92;
+const MOMENTUM_STOP = 0.02;
+const MOMENTUM_MAX_VELOCITY = 2.5;
+const MOMENTUM_MIN_DELTA = 0.5;
 
 function parseBoolean(value: string | undefined): boolean | undefined {
     if (value === 'true') return true;
     if (value === 'false') return false;
     return undefined;
+}
+
+function parseBooleanOrNumber(value: string | undefined): boolean | number | undefined {
+    if (value === undefined) return undefined;
+    if (value.trim() === '') return true;
+    const booleanValue = parseBoolean(value);
+    if (booleanValue !== undefined) return booleanValue;
+    const numberValue = parseFloat(value);
+    return Number.isFinite(numberValue) ? numberValue : undefined;
 }
 
 function normalizeDirection(value?: string): Direction | undefined {
@@ -120,10 +138,26 @@ let MARQUEES: marquee6k[] = [];
 let animationId: number = 0;
 let resizeHandler: (() => void) | null = null;
 let resizeTimer: number | undefined;
-const EVENT_HANDLERS = new WeakMap<HTMLElement, { enter: () => void; leave: () => void }>();
+type EventHandlers = {
+    enter: () => void;
+    leave: () => void;
+    pointerDown?: (event: PointerEvent) => void;
+    pointerMove?: (event: PointerEvent) => void;
+    pointerUp?: (event: PointerEvent) => void;
+    pointerCancel?: (event: PointerEvent) => void;
+    mouseDown?: (event: MouseEvent) => void;
+    mouseMove?: (event: MouseEvent) => void;
+    mouseUp?: (event: MouseEvent) => void;
+    touchStart?: (event: TouchEvent) => void;
+    touchMove?: (event: TouchEvent) => void;
+    touchEnd?: (event: TouchEvent) => void;
+    touchCancel?: (event: TouchEvent) => void;
+};
+
+const EVENT_HANDLERS = new WeakMap<HTMLElement, EventHandlers>();
 
 function prepareElement(element: HTMLElement) {
-    // If re-initializing, remove any previous wrapper so wrappers do not nest.
+    // Remove previous wrapper so re-init never nests wrappers.
     const wrapper = element.firstElementChild;
     if (wrapper && wrapper.classList.contains('marquee6k__wrapper')) {
         const original = wrapper.firstElementChild as HTMLElement | null;
@@ -141,8 +175,30 @@ class marquee6k {
     direction: Direction;
     speed: number;
     pausable: boolean;
+    tapPause: boolean;
+    scrubbing: boolean;
+    scrubDelayMs: number;
+    scrubMomentum: boolean;
     reverse: boolean;
     paused: boolean;
+    tapPaused: boolean;
+    isHovering: boolean;
+    isScrubbing: boolean;
+    isPointerDown: boolean;
+    pointerId: number | null;
+    touchId: number | null;
+    pointerStartX: number;
+    pointerStartY: number;
+    lastScrubAxis: number;
+    lastScrubTime: number;
+    lastScrubVelocity: number;
+    momentumVelocity: number;
+    momentumAnimId?: number;
+    lastMomentumTime: number;
+    scrubStartOffset: number;
+    pausedBeforeScrub: boolean;
+    hasMoved: boolean;
+    scrubResumeTimer?: number;
     parent: HTMLElement;
     parentProps: DOMRect;
     content: HTMLElement;
@@ -158,32 +214,46 @@ class marquee6k {
     onUpdate?: (instance: marquee6k) => void;
     onPause?: (instance: marquee6k) => void;
     onPlay?: (instance: marquee6k) => void;
+    initOptions: MarqueeOptions;
 
     constructor(element: HTMLElement, options: MarqueeOptions) {
         if (element.children.length === 0) {
             throw new Error('Encountered a marquee element without children, please supply a wrapper for your content');
         }
 
+        this.initOptions = { ...options };
         this.element = element;
         this.selector = options.selector || DEFAULT_SELECTOR;
         this.className = resolveClassName(options.selector, options.className);
 
-        // Direction/axis/ reverse: data-* overrides init defaults.
+        // Direction/axis/reverse: data-* overrides init defaults.
         const dataDirection = normalizeDirection(element.dataset.direction);
         const optionDirection = normalizeDirection(options.direction);
         const dataAxis = normalizeAxis(element.dataset.axis);
         const optionAxis = options.axis;
-        const direction = dataDirection || optionDirection;
         const dataReverse = parseBoolean(element.dataset.reverse);
-        const resolvedReverse = dataReverse ?? options.reverse ?? false;
+        const optionReverse = options.reverse ?? false;
 
-        if (direction) {
-            this.axis = directionToAxis(direction);
-            this.reverse = directionToReverse(direction);
-            this.direction = direction;
+        // Per-element data attributes override init options.
+        if (dataDirection) {
+            this.axis = directionToAxis(dataDirection);
+            this.reverse = directionToReverse(dataDirection);
+            this.direction = dataDirection;
+        } else if (dataAxis) {
+            this.axis = dataAxis;
+            this.reverse = dataReverse ?? optionReverse;
+            if (this.axis === 'y') {
+                this.direction = this.reverse ? 'down' : 'up';
+            } else {
+                this.direction = this.reverse ? 'right' : 'left';
+            }
+        } else if (optionDirection) {
+            this.axis = directionToAxis(optionDirection);
+            this.reverse = directionToReverse(optionDirection);
+            this.direction = optionDirection;
         } else {
-            this.axis = dataAxis || optionAxis || 'x';
-            this.reverse = resolvedReverse;
+            this.axis = optionAxis || 'x';
+            this.reverse = dataReverse ?? optionReverse;
             if (this.axis === 'y') {
                 this.direction = this.reverse ? 'down' : 'up';
             } else {
@@ -197,7 +267,40 @@ class marquee6k {
         const dataPausable = parseBoolean(element.dataset.pausable);
         this.pausable = dataPausable ?? options.pausable ?? false;
 
+        const dataTapPause = parseBoolean(element.dataset.tapPause);
+        const optionTapPause = options.tapPause;
+        this.tapPause = dataTapPause ?? optionTapPause ?? false;
+
+        const dataScrubbing = parseBooleanOrNumber(element.dataset.scrubbing);
+        const optionScrubbing = options.scrubbing;
+        const resolvedScrubbing = dataScrubbing ?? optionScrubbing ?? false;
+        this.scrubbing = resolvedScrubbing !== false;
+        this.scrubDelayMs = this.scrubbing
+            ? typeof resolvedScrubbing === 'number'
+                ? Math.max(0, resolvedScrubbing)
+                : DEFAULT_SCRUB_DELAY
+            : 0;
+        const dataScrubMomentum = parseBoolean(element.dataset.scrubMomentum);
+        this.scrubMomentum = dataScrubMomentum ?? options.scrubMomentum ?? false;
+
         this.paused = false;
+        this.tapPaused = false;
+        this.isHovering = false;
+        this.isScrubbing = false;
+        this.isPointerDown = false;
+        this.pointerId = null;
+        this.touchId = null;
+        this.pointerStartX = 0;
+        this.pointerStartY = 0;
+        this.lastScrubAxis = 0;
+        this.lastScrubTime = 0;
+        this.lastScrubVelocity = 0;
+        this.momentumVelocity = 0;
+        this.momentumAnimId = undefined;
+        this.lastMomentumTime = 0;
+        this.scrubStartOffset = 0;
+        this.pausedBeforeScrub = false;
+        this.hasMoved = false;
         const parent = element.parentElement;
         if (!parent) {
             throw new Error('Encountered a marquee element without a parent. Please wrap it in a container.');
@@ -241,23 +344,258 @@ class marquee6k {
     }
 
     _setupEvents() {
+        // Clean up existing listeners to avoid duplicates on re-init.
         const existing = EVENT_HANDLERS.get(this.element);
         if (existing) {
             this.element.removeEventListener('mouseenter', existing.enter);
             this.element.removeEventListener('mouseleave', existing.leave);
+            if (existing.pointerDown) this.element.removeEventListener('pointerdown', existing.pointerDown);
+            if (existing.pointerMove) this.element.removeEventListener('pointermove', existing.pointerMove);
+            if (existing.pointerUp) this.element.removeEventListener('pointerup', existing.pointerUp);
+            if (existing.pointerCancel) this.element.removeEventListener('pointercancel', existing.pointerCancel);
+            if (existing.mouseDown) this.element.removeEventListener('mousedown', existing.mouseDown);
+            if (existing.mouseMove) window.removeEventListener('mousemove', existing.mouseMove);
+            if (existing.mouseUp) window.removeEventListener('mouseup', existing.mouseUp);
+            if (existing.touchStart) this.element.removeEventListener('touchstart', existing.touchStart);
+            if (existing.touchMove) this.element.removeEventListener('touchmove', existing.touchMove);
+            if (existing.touchEnd) this.element.removeEventListener('touchend', existing.touchEnd);
+            if (existing.touchCancel) this.element.removeEventListener('touchcancel', existing.touchCancel);
         }
 
         const enter = () => {
-            if (this.pausable) this.pause();
+            this.isHovering = true;
+            if (this.pausable && !this.tapPaused) this.pause();
         };
 
         const leave = () => {
-            if (this.pausable) this.play();
+            this.isHovering = false;
+            if (this.pausable && !this.tapPaused && !this.isScrubbing) this.play();
         };
 
-        EVENT_HANDLERS.set(this.element, { enter, leave });
+        const handlers: EventHandlers = { enter, leave };
+        const passiveOptions: AddEventListenerOptions = { passive: true };
+        const touchMoveOptions: AddEventListenerOptions = { passive: false };
+
         this.element.addEventListener('mouseenter', enter);
         this.element.addEventListener('mouseleave', leave);
+
+        const clearScrubResume = () => {
+            if (this.scrubResumeTimer) window.clearTimeout(this.scrubResumeTimer);
+            this.scrubResumeTimer = undefined;
+        };
+
+        const scheduleScrubResume = () => {
+            clearScrubResume();
+            if (this.scrubDelayMs <= 0) {
+                if (!this.tapPaused && !(this.pausable && this.isHovering)) this.play();
+                return;
+            }
+            this.scrubResumeTimer = window.setTimeout(() => {
+                this.scrubResumeTimer = undefined;
+                if (!this.tapPaused && !(this.pausable && this.isHovering)) this.play();
+            }, this.scrubDelayMs);
+        };
+
+        const startInteraction = (clientX: number, clientY: number) => {
+            // Cancel momentum and reset scrub state for a new drag.
+            this._stopMomentum();
+            this.isPointerDown = true;
+            this.pointerStartX = clientX;
+            this.pointerStartY = clientY;
+            this.scrubStartOffset = this.offset;
+            this.hasMoved = false;
+            this.isScrubbing = false;
+            this.lastScrubAxis = 0;
+            this.lastScrubTime = getNow();
+            this.lastScrubVelocity = 0;
+            this.momentumVelocity = 0;
+            clearScrubResume();
+        };
+
+        const updateInteraction = (clientX: number, clientY: number, event?: Event) => {
+            if (!this.isPointerDown) return;
+
+            const deltaX = clientX - this.pointerStartX;
+            const deltaY = clientY - this.pointerStartY;
+            const axisDelta = this.axis === 'x' ? deltaX : deltaY;
+            const distance = Math.hypot(deltaX, deltaY);
+
+            if (distance >= SCRUB_THRESHOLD) this.hasMoved = true;
+
+            if (this.scrubbing && !this.isScrubbing && Math.abs(axisDelta) >= SCRUB_THRESHOLD) {
+                this.isScrubbing = true;
+                this.pausedBeforeScrub = this.paused;
+                if (!this.paused) this.pause();
+                this.element.classList.add('is-scrubbing');
+                this.lastScrubAxis = axisDelta;
+                this.lastScrubTime = getNow();
+            }
+
+            if (this.isScrubbing) {
+                if (event && 'preventDefault' in event && (event as Event).cancelable) {
+                    event.preventDefault();
+                }
+                const now = getNow();
+                const dt = now - this.lastScrubTime;
+                if (dt > 0) {
+                    const delta = axisDelta - this.lastScrubAxis;
+                    if (Math.abs(delta) >= MOMENTUM_MIN_DELTA) {
+                        let velocity = delta / dt;
+                        velocity = Math.max(-MOMENTUM_MAX_VELOCITY, Math.min(MOMENTUM_MAX_VELOCITY, velocity));
+                        this.lastScrubVelocity = velocity;
+                        this.momentumVelocity = velocity;
+                        this.lastScrubAxis = axisDelta;
+                        this.lastScrubTime = now;
+                    }
+                }
+                // Normalize offset so scrubbing never reveals empty gaps.
+                this.offset = this._normalizeOffset(this.scrubStartOffset + axisDelta);
+                this._applyTransform();
+            }
+        };
+
+        const finishInteraction = (allowTapToggle: boolean) => {
+            if (!this.isPointerDown) return;
+            this.isPointerDown = false;
+
+            if (this.isScrubbing) {
+                this.isScrubbing = false;
+                this.element.classList.remove('is-scrubbing');
+                if (this.scrubMomentum && !this.tapPaused && !this.pausedBeforeScrub) {
+                    this._startMomentum();
+                    return;
+                }
+                if (!this.pausedBeforeScrub && !this.tapPaused && !(this.pausable && this.isHovering)) {
+                    scheduleScrubResume();
+                }
+                return;
+            }
+
+            if (allowTapToggle && this.tapPause && !this.hasMoved) {
+                this.tapPaused = !this.tapPaused;
+                if (this.tapPaused) {
+                    this.pause();
+                } else if (!this.pausable || !this.isHovering) {
+                    this.play();
+                }
+            }
+        };
+
+        if (this.tapPause || this.scrubbing) {
+            if ('PointerEvent' in window) {
+                // Pointer events cover mouse/touch/pen in modern browsers.
+                const pointerDown = (event: PointerEvent) => {
+                    if (event.button !== 0) return;
+                    if (this.pointerId !== null) return;
+                    this.pointerId = event.pointerId;
+                    startInteraction(event.clientX, event.clientY);
+                };
+                const pointerMove = (event: PointerEvent) => {
+                    if (event.pointerId !== this.pointerId) return;
+                    updateInteraction(event.clientX, event.clientY, event);
+                    if (this.isScrubbing) {
+                        if (!this.element.hasPointerCapture?.(event.pointerId)) {
+                            this.element.setPointerCapture?.(event.pointerId);
+                        }
+                    }
+                };
+                const pointerUp = (event: PointerEvent) => {
+                    if (event.pointerId !== this.pointerId) return;
+                    updateInteraction(event.clientX, event.clientY, event);
+                    finishInteraction(true);
+                    this.pointerId = null;
+                    if (this.element.hasPointerCapture?.(event.pointerId)) {
+                        this.element.releasePointerCapture?.(event.pointerId);
+                    }
+                };
+                const pointerCancel = (event: PointerEvent) => {
+                    if (event.pointerId !== this.pointerId) return;
+                    updateInteraction(event.clientX, event.clientY, event);
+                    finishInteraction(false);
+                    this.pointerId = null;
+                    if (this.element.hasPointerCapture?.(event.pointerId)) {
+                        this.element.releasePointerCapture?.(event.pointerId);
+                    }
+                };
+
+                handlers.pointerDown = pointerDown;
+                handlers.pointerMove = pointerMove;
+                handlers.pointerUp = pointerUp;
+                handlers.pointerCancel = pointerCancel;
+
+                this.element.addEventListener('pointerdown', pointerDown);
+                this.element.addEventListener('pointermove', pointerMove);
+                this.element.addEventListener('pointerup', pointerUp);
+                this.element.addEventListener('pointercancel', pointerCancel);
+            } else {
+                // Fallback for older browsers without PointerEvent.
+                const mouseDown = (event: MouseEvent) => {
+                    if (event.button !== 0) return;
+                    startInteraction(event.clientX, event.clientY);
+                    window.addEventListener('mousemove', mouseMove);
+                    window.addEventListener('mouseup', mouseUp);
+                };
+                const mouseMove = (event: MouseEvent) => {
+                    updateInteraction(event.clientX, event.clientY, event);
+                };
+                const mouseUp = (event: MouseEvent) => {
+                    window.removeEventListener('mousemove', mouseMove);
+                    window.removeEventListener('mouseup', mouseUp);
+                    updateInteraction(event.clientX, event.clientY, event);
+                    finishInteraction(true);
+                    void event;
+                };
+
+                const touchStart = (event: TouchEvent) => {
+                    if (this.touchId !== null) return;
+                    const touch = event.changedTouches[0];
+                    if (!touch) return;
+                    this.touchId = touch.identifier;
+                    startInteraction(touch.clientX, touch.clientY);
+                };
+                const touchMove = (event: TouchEvent) => {
+                    const touch = Array.from(event.changedTouches).find(
+                        (item) => item.identifier === this.touchId,
+                    );
+                    if (!touch) return;
+                    updateInteraction(touch.clientX, touch.clientY, event);
+                };
+                const touchEnd = (event: TouchEvent) => {
+                    const touch = Array.from(event.changedTouches).find(
+                        (item) => item.identifier === this.touchId,
+                    );
+                    if (!touch) return;
+                    updateInteraction(touch.clientX, touch.clientY, event);
+                    finishInteraction(true);
+                    this.touchId = null;
+                };
+                const touchCancel = (event: TouchEvent) => {
+                    const touch = Array.from(event.changedTouches).find(
+                        (item) => item.identifier === this.touchId,
+                    );
+                    if (!touch) return;
+                    updateInteraction(touch.clientX, touch.clientY, event);
+                    finishInteraction(false);
+                    this.touchId = null;
+                };
+
+                handlers.mouseDown = mouseDown;
+                handlers.mouseMove = mouseMove;
+                handlers.mouseUp = mouseUp;
+                handlers.touchStart = touchStart;
+                handlers.touchMove = touchMove;
+                handlers.touchEnd = touchEnd;
+                handlers.touchCancel = touchCancel;
+
+                this.element.addEventListener('mousedown', mouseDown);
+                this.element.addEventListener('touchstart', touchStart, passiveOptions);
+                this.element.addEventListener('touchmove', touchMove, touchMoveOptions);
+                this.element.addEventListener('touchend', touchEnd, passiveOptions);
+                this.element.addEventListener('touchcancel', touchCancel, passiveOptions);
+            }
+        }
+
+        EVENT_HANDLERS.set(this.element, handlers);
     }
 
     _createClone() {
@@ -301,6 +639,74 @@ class marquee6k {
         this.element.classList.add('is-init');
     }
 
+    _normalizeOffset(value: number) {
+        // Keep offset within a single loop range to avoid blank space.
+        if (!this.contentWidth) return value;
+        const width = this.contentWidth;
+        const normalized = ((value % width) + width) % width;
+        return normalized - width;
+    }
+
+    _startMomentum() {
+        // Apply decaying velocity after scrubbing ends.
+        if (this.momentumAnimId) window.cancelAnimationFrame(this.momentumAnimId);
+        const now = getNow();
+        if (Math.abs(this.lastScrubVelocity) > Math.abs(this.momentumVelocity)) {
+            this.momentumVelocity = this.lastScrubVelocity;
+        }
+        const dt =
+            this.lastScrubTime > 0
+                ? Math.max(16, Math.min(40, now - this.lastScrubTime))
+                : 16.67;
+        if (Math.abs(this.momentumVelocity) <= MOMENTUM_STOP) {
+            this.momentumVelocity = 0;
+            this.lastMomentumTime = now;
+            if (!this.tapPaused && !(this.pausable && this.isHovering) && !this.pausedBeforeScrub) {
+                this.play();
+            }
+            return;
+        }
+
+        this.offset = this._normalizeOffset(this.offset + this.momentumVelocity * dt);
+        this._applyTransform();
+        this.lastMomentumTime = now;
+        const step = (now: number) => {
+            const dt = now - this.lastMomentumTime;
+            this.lastMomentumTime = now;
+            const decay = Math.pow(MOMENTUM_FRICTION, dt / 16.67);
+            this.momentumVelocity *= decay;
+
+            if (Math.abs(this.momentumVelocity) <= MOMENTUM_STOP) {
+                this.momentumVelocity = 0;
+                this.momentumAnimId = undefined;
+                if (!this.tapPaused && !(this.pausable && this.isHovering) && !this.pausedBeforeScrub) {
+                    this.play();
+                }
+                return;
+            }
+
+            this.offset = this._normalizeOffset(this.offset + this.momentumVelocity * dt);
+            this._applyTransform();
+            this.momentumAnimId = window.requestAnimationFrame(step);
+        };
+        this.momentumAnimId = window.requestAnimationFrame(step);
+    }
+
+    _stopMomentum() {
+        // Cancel any active momentum loop.
+        if (this.momentumAnimId) {
+            window.cancelAnimationFrame(this.momentumAnimId);
+            this.momentumAnimId = undefined;
+        }
+        this.momentumVelocity = 0;
+    }
+
+    _applyTransform() {
+        const translateX = this.axis === 'x' ? this.offset : 0;
+        const translateY = this.axis === 'y' ? this.offset : 0;
+        this.wrapper.style.transform = `translate(${translateX}px, ${translateY}px) translateZ(0)`;
+    }
+
     animate() {
         if (!this.paused) {
             // Move content and loop seamlessly.
@@ -311,9 +717,7 @@ class marquee6k {
             if (isScrolled) this.offset -= this.speed * direction;
             else this.offset = reset;
 
-            const translateX = this.axis === 'x' ? this.offset : 0;
-            const translateY = this.axis === 'y' ? this.offset : 0;
-            this.wrapper.style.transform = `translate(${translateX}px, ${translateY}px) translateZ(0)`;
+            this._applyTransform();
 
             if (this.onUpdate) {
                 // Throttle onUpdate to reduce callback overhead when desired.
@@ -381,6 +785,12 @@ class marquee6k {
         }
     }
 
+    static reinit(index: number, options?: MarqueeOptions) {
+        const instance = MARQUEES[index];
+        if (!instance) return;
+        instance.reinit(options);
+    }
+
     pause() {
         if (!this.paused) {
             this.paused = true;
@@ -398,6 +808,24 @@ class marquee6k {
     toggle() {
         if (this.paused) this.play();
         else this.pause();
+    }
+
+    reinit(options?: MarqueeOptions) {
+        if (this.scrubResumeTimer) {
+            window.clearTimeout(this.scrubResumeTimer);
+            this.scrubResumeTimer = undefined;
+        }
+        this._stopMomentum();
+
+        const mergedOptions = options ? { ...this.initOptions, ...options } : this.initOptions;
+        prepareElement(this.element);
+        const instance = new marquee6k(this.element, mergedOptions);
+        const index = MARQUEES.indexOf(this);
+        if (index >= 0) {
+            MARQUEES[index] = instance;
+        } else {
+            MARQUEES.push(instance);
+        }
     }
 
     static init(options: MarqueeOptions = {}) {

@@ -3,7 +3,32 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>marquee6k - Visual QA and Testing</title>
+        <title>marquee6k - Test Examples</title>
+        <meta
+            name="description"
+            content="Visual QA and interaction test examples for marquee6k, the lightweight JavaScript marquee library."
+        />
+        <link rel="canonical" href="https://github.com/SPACESODA/marquee6k" />
+        <link rel="home" href="index.html" />
+        <meta name="robots" content="noindex, follow" />
+        <meta name="application-name" content="marquee6k" />
+        <meta name="author" content="SPACESODA" />
+        <meta name="theme-color" content="#f6f2ea" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="marquee6k" />
+        <meta property="og:title" content="marquee6k - Test Examples" />
+        <meta
+            property="og:description"
+            content="Visual QA and interaction test examples for marquee6k, the lightweight JavaScript marquee library."
+        />
+        <meta property="og:url" content="https://github.com/SPACESODA/marquee6k" />
+        <meta property="og:locale" content="en_US" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="marquee6k - Test Examples" />
+        <meta
+            name="twitter:description"
+            content="Visual QA and interaction test examples for marquee6k, the lightweight JavaScript marquee library."
+        />
         <style>
             :root {
                 color-scheme: light;
@@ -82,6 +107,12 @@
                 line-height: 1.5;
             }
 
+            .hint {
+                font-size: 13px;
+                color: var(--ink-soft);
+                margin: 0;
+            }
+
             h2 {
                 margin: 0 0 10px;
                 font-size: 14px;
@@ -91,12 +122,23 @@
                 color: var(--ink-soft);
             }
 
+            .card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .card-header h2 {
+                margin: 0;
+            }
+
             .controls {
                 display: flex;
                 gap: 10px;
                 flex-wrap: wrap;
             }
-
 
             button {
                 padding: 10px 16px;
@@ -106,6 +148,18 @@
                 cursor: pointer;
                 font-weight: 600;
                 transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            }
+
+            button.ghost {
+                background: #fff;
+                border-color: #d8d0c3;
+                color: var(--ink-soft);
+                box-shadow: none;
+            }
+
+            button.small {
+                font-size: 12px;
+                padding: 8px 14px;
             }
 
             button:hover {
@@ -137,6 +191,10 @@
                 gap: 12px;
                 min-width: 0;
                 animation: rise 0.6s ease both;
+            }
+
+            .card > * {
+                min-width: 0;
             }
 
             .card:nth-child(2) { animation-delay: 0.08s; }
@@ -186,6 +244,62 @@
             .demo-marquee__copy {
                 padding-right: 26px;
                 padding-bottom: 12px;
+            }
+
+            .marquee6k[data-scrubbing],
+            .marquee-viewport.scrubbable {
+                cursor: grab;
+            }
+
+            .marquee6k[data-scrubbing] *,
+            .marquee-viewport.scrubbable * {
+                cursor: inherit;
+            }
+
+            .marquee6k[data-scrubbing]:active,
+            .marquee6k[data-scrubbing]:active *,
+            .marquee-viewport.scrubbable:active,
+            .marquee-viewport.scrubbable:active * {
+                cursor: grabbing;
+            }
+
+            .marquee6k.is-scrubbing,
+            .marquee6k.is-scrubbing * {
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            .hidden-case.is-hidden {
+                display: none;
+            }
+
+            .resize-case {
+                width: min(100%, 520px);
+                transition: width 0.2s ease;
+            }
+
+            .resize-case.is-narrow {
+                width: 260px;
+            }
+
+            .hidden-case,
+            .resize-case {
+                max-width: 100%;
+            }
+
+            .vertical-frame {
+                height: 200px;
+                overflow: hidden;
+            }
+
+            .transformed-parent {
+                overflow: hidden;
+                padding: 8px 0;
+            }
+
+            .transformed-inner {
+                transform: scale(0.85) rotate(1.5deg);
+                transform-origin: center;
             }
 
             .tag {
@@ -326,6 +440,7 @@
                     <button type="button" onclick="marquee6k.pauseAll()">Pause all</button>
                     <button type="button" onclick="marquee6k.toggleAll()">Toggle all</button>
                     <button type="button" onclick="marquee6k.refreshAll()">Refresh all</button>
+                    <button class="ghost" type="button" id="reinit-all">Re-init all</button>
                 </div>
             </section>
 
@@ -461,6 +576,93 @@
                 </section>
 
                 <section class="card">
+                    <h2>Tap pause (toggle)</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k" data-speed="0.45" data-tap-pause="true">
+                            <div>
+                                <span class="tag">Tap</span>
+                                <span class="tag alt">To</span>
+                                <span class="tag">Pause</span>
+                                <span class="tag alt">Again</span>
+                                <span class="tag">Play</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Scrubbing (drag to scrub)</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0.4" data-scrubbing="true">
+                            <div>
+                                <span class="tag alt">Drag</span>
+                                <span class="tag">Scrub</span>
+                                <span class="tag alt">Release</span>
+                                <span class="tag">Resume</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Pausable + scrubbing</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0.4" data-pausable="true" data-scrubbing="true">
+                            <div>
+                                <span class="tag">Hover</span>
+                                <span class="tag alt">Pause</span>
+                                <span class="tag">Drag</span>
+                                <span class="tag alt">Scrub</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Scrubbing delay (800ms)</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0.4" data-scrubbing="800">
+                            <div>
+                                <span class="tag alt">Delay</span>
+                                <span class="tag">800ms</span>
+                                <span class="tag alt">After</span>
+                                <span class="tag">Release</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Scrub momentum</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0.4" data-scrubbing="true" data-scrub-momentum="true">
+                            <div>
+                                <span class="tag">Flick</span>
+                                <span class="tag alt">Release</span>
+                                <span class="tag">Momentum</span>
+                                <span class="tag alt">Glide</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Tap pause + scrubbing</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0.4" data-tap-pause="true" data-scrubbing="true">
+                            <div>
+                                <span class="tag">Tap</span>
+                                <span class="tag alt">Pause</span>
+                                <span class="tag">Drag</span>
+                                <span class="tag alt">Scrub</span>
+                                <span class="tag">Tap</span>
+                                <span class="tag alt">Resume</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
                     <h2>Angled cross</h2>
                     <div class="marquee-viewport cross-box">
                         <div class="cross-line cross-line--a">
@@ -503,14 +705,140 @@
                 </section>
 
                 <section class="card">
-                    <h2>Edge case: zero speed</h2>
+                    <h2>Diagonal wrapper + scrubbing</h2>
+                    <div class="diagonal-marquee">
+                        <div class="marquee-viewport horizontal scrubbable">
+                            <div class="marquee6k" data-speed="0.5" data-direction="left" data-scrubbing="true">
+                                <div>
+                                    <span class="tag">Diagonal</span>
+                                    <span class="tag alt">Scrub</span>
+                                    <span class="tag">Test</span>
+                                    <span class="tag alt">Tilt</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Transformed parent (scale + rotate)</h2>
+                    <div class="transformed-parent">
+                        <div class="transformed-inner">
+                            <div class="marquee-viewport horizontal">
+                                <div class="marquee6k" data-speed="0.45" data-direction="left">
+                                    <div>
+                                        <span class="tag">Transformed</span>
+                                        <span class="tag alt">Parent</span>
+                                        <span class="tag">Scale</span>
+                                        <span class="tag alt">Rotate</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: single word content</h2>
                     <div class="marquee-viewport horizontal">
-                        <div class="marquee6k" data-speed="0" data-pausable="true">
+                        <div class="marquee6k" data-speed="0.5">
+                            <div>
+                                <span class="tag alt">Solo</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: very long content</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k" data-speed="0.35">
+                            <div>
+                                <span class="tag">Long</span>
+                                <span class="tag alt">Content</span>
+                                <span class="tag">Should</span>
+                                <span class="tag alt">Still</span>
+                                <span class="tag">Flow</span>
+                                <span class="tag alt">Across</span>
+                                <span class="tag">The</span>
+                                <span class="tag alt">Viewport</span>
+                                <span class="tag">Without</span>
+                                <span class="tag alt">Glitches</span>
+                                <span class="tag">Or</span>
+                                <span class="tag alt">Jumping</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: vertical fixed height</h2>
+                    <div class="vertical-frame">
+                        <div class="marquee-viewport vertical">
+                            <div class="marquee6k" data-speed="0.45" data-direction="up" data-pausable="true">
+                                <div>
+                                    <div class="tag">Fixed</div>
+                                    <div class="tag alt">Height</div>
+                                    <div class="tag">Overflow</div>
+                                    <div class="tag alt">Hidden</div>
+                                    <div class="tag">Parent</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: tap pause + hover</h2>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k" data-speed="0.4" data-pausable="true" data-tap-pause="true">
+                            <div>
+                                <span class="tag">Tap</span>
+                                <span class="tag alt">Locks</span>
+                                <span class="tag">Hover</span>
+                                <span class="tag alt">Pause</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: scrubbing vertical</h2>
+                    <div class="marquee-viewport vertical scrubbable">
+                        <div class="marquee6k" data-speed="0.45" data-direction="up" data-scrubbing="true">
+                            <div>
+                                <div class="tag">Drag</div>
+                                <div class="tag alt">Vertical</div>
+                                <div class="tag">Scrub</div>
+                                <div class="tag alt">Only</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: scrubbing delay 0</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0.4" data-scrubbing="0">
+                            <div>
+                                <span class="tag alt">Delay</span>
+                                <span class="tag">0ms</span>
+                                <span class="tag alt">Instant</span>
+                                <span class="tag">Resume</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Edge case: zero speed + scrubbing</h2>
+                    <div class="marquee-viewport horizontal scrubbable">
+                        <div class="marquee6k" data-speed="0" data-pausable="true" data-scrubbing="true">
                             <div>
                                 <span class="tag alt">Speed</span>
                                 <span class="tag">Zero</span>
-                                <span class="tag alt">Stops</span>
-                                <span class="tag">Motion</span>
+                                <span class="tag alt">Scrub</span>
+                                <span class="tag">Only</span>
                             </div>
                         </div>
                     </div>
@@ -530,6 +858,64 @@
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Edge case: hidden on load</h2>
+                        <button class="ghost small" type="button" id="toggle-hidden">Toggle visibility</button>
+                    </div>
+                    <div class="hidden-case is-hidden" data-hidden-case>
+                        <div class="marquee-viewport horizontal">
+                            <div class="marquee6k" data-speed="0.5">
+                                <div>
+                                    <span class="tag">Hidden</span>
+                                    <span class="tag alt">On</span>
+                                    <span class="tag">Load</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Edge case: resize container</h2>
+                        <button class="ghost small" type="button" id="toggle-resize">Toggle width</button>
+                    </div>
+                    <div class="resize-case is-narrow" data-resize-case>
+                        <div class="marquee-viewport horizontal">
+                            <div class="marquee6k" data-speed="0.45">
+                                <div>
+                                    <span class="tag">Resize</span>
+                                    <span class="tag alt">Parent</span>
+                                    <span class="tag">Then</span>
+                                    <span class="tag alt">Refresh</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Edge case: re-init (full rebuild)</h2>
+                        <button class="ghost small" type="button" id="reinit-single">Re-init this one only</button>
+                    </div>
+                    <div class="marquee-viewport horizontal">
+                        <div class="marquee6k reinit-target" data-speed="0.45">
+                            <div>
+                                <span class="tag alt">Re-init</span>
+                                <span class="tag">No</span>
+                                <span class="tag alt">Nested</span>
+                                <span class="tag">Wrappers</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="hint">
+                        "Re-init all" rebuilds every marquee.
+                        "Re-init this one only" rebuilds a single instance using the original init options.
+                    </p>
                 </section>
             </div>
 
@@ -579,6 +965,46 @@
             };
 
             marquee6k.init(window.MARQUEE_OPTIONS);
+
+            const hiddenToggle = document.getElementById('toggle-hidden');
+            const hiddenCase = document.querySelector('[data-hidden-case]');
+            if (hiddenToggle && hiddenCase) {
+                hiddenToggle.addEventListener('click', () => {
+                    hiddenCase.classList.toggle('is-hidden');
+                    requestAnimationFrame(() => {
+                        marquee6k.refreshAll();
+                    });
+                });
+            }
+
+            const resizeToggle = document.getElementById('toggle-resize');
+            const resizeCase = document.querySelector('[data-resize-case]');
+            if (resizeToggle && resizeCase) {
+                resizeToggle.addEventListener('click', () => {
+                    resizeCase.classList.toggle('is-narrow');
+                    marquee6k.refreshAll();
+                });
+            }
+
+            const reinitButton = document.getElementById('reinit-all');
+            if (reinitButton) {
+                reinitButton.addEventListener('click', () => {
+                    marquee6k.init(window.MARQUEE_OPTIONS);
+                });
+            }
+
+            const reinitSingleButton = document.getElementById('reinit-single');
+            const reinitTarget = document.querySelector('.reinit-target');
+            if (reinitSingleButton && reinitTarget) {
+                reinitSingleButton.addEventListener('click', () => {
+                    const index = window.MARQUEES.findIndex(
+                        (instance) => instance.element === reinitTarget,
+                    );
+                    if (index >= 0) {
+                        marquee6k.reinit(index);
+                    }
+                });
+            }
         </script>
     </body>
 </html>

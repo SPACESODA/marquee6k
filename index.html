@@ -396,37 +396,26 @@
             <div class="info-card">
                 <p class="section-title">Implementation</p>
                 <h2>How to add a marquee</h2>
-                <p>A simple drop-in setup: add a <code>.marquee6k</code> element with a single child wrapper,
-                    set optional <code>data-*</code> attributes, include the script, then call
-                    <code>marquee6k.init()</code>. If you load images or webfonts, initialize on
-                    <code>load</code> (or call <code>marquee6k.refreshAll()</code> after assets finish loading).</p>
+                <p>A simple drop-in setup: add a <code>.marquee6k</code> element with a single child wrapper, 
+                    set optional attributes, include the script, then call <code>marquee6k.init()</code>. 
+                    If you load images or webfonts, initialize on <code>load</code> (or call <code>marquee6k.refreshAll()</code> after assets finish loading).</p>
                 <div class="info-grid">
                     <div>
                         <div class="info-list">
                             <div class="info-item">
-                                <strong>1) HTML</strong>
-                                <div>Add <code>class="marquee6k"</code> and wrap your content in a single child element
-                                    (required) — put any HTML inside (text, images, etc.).
+                                <strong>1: Script + Init</strong>
+                                <div>Include the script before <code>&lt;/body&gt;</code> and call <code>marquee6k.init()</code> (use <code>load</code> if assets affect size).</div>
+                            </div>
+                            <div class="info-item">
+                                <strong>2: HTML + Config</strong>
+                                <div>Add <code>class="marquee6k"</code> and wrap your content in a single child element (required). Optional attributes:
+                                    <code>data-speed</code>, <code>data-direction</code>, <code>data-axis</code>,
+                                    <code>data-reverse</code>, <code>data-pausable</code>, <code>data-tap-pause</code>,
+                                    <code>data-scrubbing</code>, <code>data-scrub-momentum</code>.
                                 </div>
                             </div>
                             <div class="info-item">
-                                <strong>2) Configuration</strong>
-                                <div>
-                                    Use <code>data-speed</code> (e.g. <code>0.25</code>, default is <code>0.25</code>),
-                                    <code>data-reverse</code>
-                                    (<code>"true"</code>/<code>"false"</code>), <code>data-direction</code>
-                                    (<code>left</code>/<code>right</code>/<code>up</code>/<code>down</code>),
-                                    <code>data-axis</code> (<code>x</code>/<code>y</code>), and
-                                    <code>data-pausable</code> (pause on hover).
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <strong>3) Initialization</strong>
-                                <div>Call <code>marquee6k.init()</code> after your DOM is ready (or on
-                                    <code>load</code> if you use images or webfonts).</div>
-                            </div>
-                            <div class="info-item">
-                                <strong>4) Styling</strong>
+                                <strong>3: Styling</strong>
                                 <div>Control the gap between repeats with CSS on <code>.marquee6k__copy</code>.</div>
                             </div>
                         </div>

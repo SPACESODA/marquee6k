@@ -18,6 +18,7 @@ Marquees forever ✨✨✨
 - Turn any element into a smooth-as-butter marquee
 - Style marquees as usual with CSS
 - Set speed and direction (left/right/up/down)
+- Responsive, tap-to-pause, and drag-scrubbing
 - Access Marquee instances globally
 - Have a ton without any slowdown!
 
@@ -34,6 +35,13 @@ Marquees forever ✨✨✨
     ```html
     <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
     <script>marquee6k.init();</script>
+    ```
+
+    If the marquee's content or styling depends on images or webfonts (anything that can change its size after load), you can initialize on `load` to ensure measurements are correct:
+
+    ```html
+    <script src="https://cdn.jsdelivr.net/gh/SPACESODA/marquee6k@latest/marquee6k.min.js"></script>
+    <script>window.addEventListener('load', () => marquee6k.init());</script>
     ```
    
    Via [npm](https://www.npmjs.com/package/marquee6k) (bundler):
@@ -57,7 +65,7 @@ Marquees forever ✨✨✨
 
 2. Create an element with a `.marquee6k` class.
    
-   You can pass options via data attributes such as speed, reverse, pausable, direction, and axis. See the **Data attributes per element** section for more options.
+   You can pass options via data attributes such as speed, reverse, pausable, tap-pause, scrubbing, scrub-momentum, direction, and axis. See the **Data attributes per element** section for more options.
 
     ```html
     <div class="marquee6k"
@@ -94,8 +102,11 @@ marquee6k.init({
     selector: 'selector-name', // class name or CSS selector
     className: 'marquee6k', // base class for __copy (optional)
     speed: 0.25,
-    reverse: false,
     pausable: false,
+    tapPause: false,
+    scrubbing: 600,
+    scrubMomentum: false,
+    reverse: false,
     axis: 'x', // 'x' | 'y'
     direction: 'left', // 'left' | 'right' | 'up' | 'down'
     onInit: (instance) => {},
@@ -112,6 +123,9 @@ marquee6k.init({
 | `className` | string | derived | Base class for `${className}__copy` (defaults to last class in `selector` or `marquee6k`) |
 | `speed` | number | `0.25` | Pixels per frame |
 | `pausable` | boolean | `false` | Pause on hover |
+| `tapPause` | boolean | `false` | Tap/click toggles pause; hover (`pausable` / `data-pausable`) never resumes a tap-paused marquee |
+| `scrubbing` | boolean or number | `false` | Drag to scrub; `true` uses a 250ms resume delay, or pass a delay in ms |
+| `scrubMomentum` | boolean | `false` | Keep moving after scrubbing with decaying momentum |
 | `reverse` | boolean | `false` | Ignored if `direction` is set |
 | `axis` | `x` / `y` | `x` | Ignored if `direction` is set |
 | `direction` | `left` / `right` / `up` / `down` | `left` | Explicit direction; takes precedence over `axis` and `reverse` |
@@ -151,6 +165,13 @@ These are read from each marquee element's `data-*` attributes:
 | `data-reverse` | `true` / `false` | `false` | Ignored if `data-direction` is set |
 | `data-speed` | number | `0.25` | Pixels per frame |
 | `data-pausable` | `true` / `false` | `false` | Pause on hover |
+| `data-tap-pause` | `true` / `false` | `false` | Tap/click toggles pause; hover  (by `pausable` / `data-pausable`) never resumes a tap-paused marquee |
+| `data-scrubbing` | `true` / number | `false` | Drag to scrub; `true` uses a 250ms resume delay, or pass a delay in ms |
+| `data-scrub-momentum` | `true` / `false` | `false` | Keep moving after scrubbing with decaying momentum |
+
+Scrubbing begins after ~10px of movement along the marquee axis. Release resumes after the delay unless tap-paused (or still hovering when `pausable` is true). If `scrubMomentum` is enabled, the marquee keeps moving briefly after release.
+
+While scrubbing, the marquee adds an `is-scrubbing` class; you can use it to disable text selection if needed.
 
 #### data-direction vs data-axis
 
@@ -162,6 +183,8 @@ These are read from each marquee element's `data-*` attributes:
 - `y` + `data-reverse="true"` → down.
 
 If both are present, `data-direction` takes precedence.
+
+If `data-axis` is present (and `data-direction` is not), it overrides the init `direction` option for that element.
 
 #### Vertical marquee example
 
@@ -205,6 +228,42 @@ Each marquee element gets an `is-init` class after it finishes initializing. Use
 
 ## Controls
 
+### Play
+
+You can start the animation after being paused by:
+
+```javascript
+// Play all instances
+marquee6k.playAll();
+
+// or target a specific instance
+marquee6k.play(index); // index of marquee
+```
+
+### Pause
+
+You can stop the animation by:
+
+```javascript
+// Pause all instances
+marquee6k.pauseAll();
+
+// or target a specific instance
+marquee6k.pause(index); // index of marquee
+```
+
+### Toggle
+
+You can toggle the animation by:
+
+```javascript
+// Toggle all instances
+marquee6k.toggleAll();
+
+// or target a specific instance
+marquee6k.toggle(index); // index of marquee
+```
+
 ### Refresh
 
 You can refresh (if width of the inner content changes dynamically) by:
@@ -218,42 +277,20 @@ marquee6k.refresh(index); // index of marquee
 ```
 
 Refresh will rebuild clones and reset the position, so it is safe to call after content or layout changes.
-    
-### Pause
 
-You can stop the animation by:
+### Re-init all
 
-```javascript
-// Refresh all instances
-marquee6k.pauseAll();
+To re-initialize all instances (full rebuild), call `marquee6k.init()` again with the same options.
 
-// or target a specific instance
-marquee6k.pause(index); // index of marquee
-```
+### Re-init (single instance)
 
-### Play
-
-You can start the animation after being paused by:
+If the inner markup is replaced and a refresh is not enough, re-initialize a single marquee:
 
 ```javascript
-// Refresh all instances
-marquee6k.playAll();
-
-// or target a specific instance
-marquee6k.play(index); // index of marquee
+marquee6k.reinit(index); // rebuilds one instance using its original init options
 ```
 
-### Toggle
-
-You can toggle the animation by:
-
-```javascript
-// Refresh all instances
-marquee6k.toggleAll();
-
-// or target a specific instance
-marquee6k.toggle(index); // index of marquee
-```
+Re-init removes the old wrapper, rebuilds clones, and rebinds events for that element only.
 
 <br>
 
