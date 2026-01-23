@@ -135,6 +135,12 @@ marquee6k.init({
 | `onPlay` | function | — | Called when a marquee resumes |
 | `onUpdateThrottle` | number (ms) | — | Throttles `onUpdate` calls |
 
+#### Scrubbing
+
+Scrubbing begins after ~10px of movement along the marquee axis. Release resumes after the delay unless tap-paused (or still hovering when `pausable` is true).
+
+If `scrubMomentum` is enabled, the marquee keeps moving briefly after release. While scrubbing, the marquee adds an `is-scrubbing` class; you can use it to disable text selection if needed.
+
 ### Selector
 
 The default selector is `marquee6k`, so `marquee6k.init()` looks for `.marquee6k` elements. You can also pass a full CSS selector (e.g. `#section .marquee`, `.box[data-brands="marquee"]`), more examples below. If your selector is not a simple class, set `className` to control the `${className}__copy` class used for styling.
@@ -169,10 +175,6 @@ These are read from each marquee element's `data-*` attributes:
 | `data-scrubbing` | `true` / number | `false` | Drag to scrub; `true` uses a 250ms resume delay, or pass a delay in ms |
 | `data-scrub-momentum` | `true` / `false` | `false` | Keep moving after scrubbing with decaying momentum |
 
-Scrubbing begins after ~10px of movement along the marquee axis. Release resumes after the delay unless tap-paused (or still hovering when `pausable` is true). If `scrubMomentum` is enabled, the marquee keeps moving briefly after release.
-
-While scrubbing, the marquee adds an `is-scrubbing` class; you can use it to disable text selection if needed.
-
 #### data-direction vs data-axis
 
 `data-direction` is explicit; `data-axis` is a shorthand for orientation and works with `data-reverse` to determine direction:
@@ -180,7 +182,7 @@ While scrubbing, the marquee adds an `is-scrubbing` class; you can use it to dis
 - `x` + `data-reverse="false"` → left
 - `x` + `data-reverse="true"` → right
 - `y` + `data-reverse="false"` → up
-- `y` + `data-reverse="true"` → down.
+- `y` + `data-reverse="true"` → down
 
 Order of precedence (highest → lowest): `data-direction`, `data-axis` (and `data-reverse` if provided), init `direction`, init `axis`/`reverse`.
 
