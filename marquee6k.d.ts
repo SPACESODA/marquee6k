@@ -99,6 +99,7 @@ declare class marquee6k {
     static playAll(): void;
     static toggleAll(): void;
     static reinit(index: number, options?: MarqueeOptions): void;
+    static reinitElement(element: HTMLElement, options?: MarqueeOptions): void;
     pause(): void;
     play(): void;
     toggle(): void;

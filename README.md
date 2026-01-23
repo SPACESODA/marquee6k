@@ -182,9 +182,7 @@ While scrubbing, the marquee adds an `is-scrubbing` class; you can use it to dis
 - `y` + `data-reverse="false"` → up
 - `y` + `data-reverse="true"` → down.
 
-If both are present, `data-direction` takes precedence.
-
-If `data-axis` is present (and `data-direction` is not), it overrides the init `direction` option for that element.
+Order of precedence (highest → lowest): `data-direction`, `data-axis` (and `data-reverse` if provided), init `direction`, init `axis`/`reverse`.
 
 #### Vertical marquee example
 
@@ -284,10 +282,16 @@ To re-initialize all instances (full rebuild), call `marquee6k.init()` again wit
 
 ### Re-init (single instance)
 
-If the inner markup is replaced and a refresh is not enough, re-initialize a single marquee:
+If the inner markup is replaced and a refresh does not rebuild the structure, re-initialize a single marquee:
 
 ```javascript
 marquee6k.reinit(index); // rebuilds one instance using its original init options
+```
+
+You can also re-init by element reference:
+
+```javascript
+marquee6k.reinitElement(document.querySelector('.marquee6k'));
 ```
 
 Re-init removes the old wrapper, rebuilds clones, and rebinds events for that element only.

@@ -709,6 +709,12 @@ class marquee6k {
             return;
         instance.reinit(options);
     }
+    static reinitElement(element, options) {
+        const index = MARQUEES.findIndex((instance) => instance.element === element);
+        if (index < 0)
+            return;
+        MARQUEES[index].reinit(options);
+    }
     pause() {
         if (!this.paused) {
             this.paused = true;

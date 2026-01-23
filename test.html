@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -952,8 +952,7 @@
                     console.log('play', instance);
                     if (lastEventEl) lastEventEl.textContent = 'play';
                 },
-                onUpdate: (instance) => {
-                    void instance;
+                onUpdate: (onUpdate_instance) => {
                     const now = performance.now();
                     if (now - lastUpdate > 250) {
                         updateCount += 1;
@@ -997,12 +996,7 @@
             const reinitTarget = document.querySelector('.reinit-target');
             if (reinitSingleButton && reinitTarget) {
                 reinitSingleButton.addEventListener('click', () => {
-                    const index = window.MARQUEES.findIndex(
-                        (instance) => instance.element === reinitTarget,
-                    );
-                    if (index >= 0) {
-                        marquee6k.reinit(index);
-                    }
+                    marquee6k.reinitElement(reinitTarget);
                 });
             }
         </script>
