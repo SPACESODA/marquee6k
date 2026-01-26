@@ -6,7 +6,7 @@
 const DEFAULT_SELECTOR = 'marquee6k';
 const DEFAULT_SPEED = 0.25;
 const DEFAULT_SCRUB_DELAY = 250;
-const SCRUB_THRESHOLD = 10;
+const SCRUB_THRESHOLD = 5;
 const MOMENTUM_FRICTION = 0.92;
 const MOMENTUM_STOP = 0.02;
 const MOMENTUM_MAX_VELOCITY = 2.5;
@@ -230,6 +230,12 @@ class marquee6k {
             : 0;
         const dataScrubMomentum = parseBoolean(element.dataset.scrubMomentum);
         this.scrubMomentum = dataScrubMomentum ?? options.scrubMomentum ?? false;
+        if (this.scrubbing) {
+            this.element.style.touchAction = this.axis === 'x' ? 'pan-y' : 'pan-x';
+        }
+        else {
+            this.element.style.removeProperty('touch-action');
+        }
         this.paused = false;
         this.tapPaused = false;
         this.isHovering = false;
